@@ -1,8 +1,8 @@
-# Accessing an FTP server using Skupper
+# Accessing a TCP server using Skupper
 
-[![main](https://github.com/skupperproject/skupper-example-ftp/actions/workflows/main.yaml/badge.svg)](https://github.com/skupperproject/skupper-example-ftp/actions/workflows/main.yaml)
+[![main](https://github.com/skupperproject/skupper-example-tcp/actions/workflows/main.yaml/badge.svg)](https://github.com/skupperproject/skupper-example-tcp/actions/workflows/main.yaml)
 
-#### Securely connect to an FTP server on a remote Kubernetes cluster
+#### Securely connect to a TCP server on a remote Kubernetes cluster
 
 
 This example is part of a [suite of examples][examples] showing the
@@ -23,16 +23,15 @@ across cloud providers, data centers, and edge sites.
 * [Step 4: Install Skupper in your namespaces](#step-4-install-skupper-in-your-namespaces)
 * [Step 5: Check the status of your namespaces](#step-5-check-the-status-of-your-namespaces)
 * [Step 6: Link your namespaces](#step-6-link-your-namespaces)
-* [Step 7: Deploy the FTP server](#step-7-deploy-the-ftp-server)
-* [Step 8: Expose the FTP server](#step-8-expose-the-ftp-server)
-* [Step 9: Run the FTP client](#step-9-run-the-ftp-client)
+* [Step 7: Deploy the TCP server](#step-7-deploy-the-tcp-server)
+* [Step 8: Expose the TCP server](#step-8-expose-the-tcp-server)
+* [Step 9: Run the TCP client](#step-9-run-the-tcp-client)
 * [Accessing the web console](#accessing-the-web-console)
 * [Cleaning up](#cleaning-up)
 
 ## Overview
 
-This example shows you how you can use Skupper to connect an FTP
-client on one Kubernetes cluster to an FTP server on another.
+XXX
 
 ## Prerequisites
 
@@ -266,68 +265,58 @@ to use `sftp` or a similar tool to transfer the token securely.
 By default, tokens expire after a single use or 15 minutes after
 creation.
 
-## Step 7: Deploy the FTP server
+## Step 7: Deploy the TCP server
 
-In the east namespace, use `kubectl apply` to deploy the FTP
+In the east namespace, use `kubectl create deployment` to deploy the TCP
 server.
 
 _**Console for east:**_
 
 ~~~ shell
-kubectl apply -f ftp-server
+kubectl create deployment tcp-server --image quay.io/skupper/tcp-example-server
 ~~~
 
 _Sample output:_
 
 ~~~ console
-$ kubectl apply -f ftp-server
-deployment.apps/ftp-server created
+$ kubectl create deployment tcp-server --image quay.io/skupper/tcp-example-server
+deployment.apps/tcp-server created
 ~~~
 
-## Step 8: Expose the FTP server
+## Step 8: Expose the TCP server
 
-In the east namespace, use `skupper expose` to expose the FTP
+In the east namespace, use `skupper expose` to expose the TCP
 server on all linked sites.
 
 _**Console for east:**_
 
 ~~~ shell
-skupper expose deployment/ftp-server --port 21100 --port 2121 --target-port 21100 --target-port 21
+skupper expose deployment/tcp-server --port 9090
 ~~~
 
 _Sample output:_
 
 ~~~ console
-$ skupper expose deployment/ftp-server --port 21100 --port 2121 --target-port 21100 --target-port 21
-deployment ftp-server exposed as ftp-server
+$ skupper expose deployment/tcp-server --port 9090
+deployment tcp-server exposed as tcp-server
 ~~~
 
-## Step 9: Run the FTP client
+## Step 9: Run the TCP client
 
 In the west namespace, use `kubectl run` and the `curl` image to
-perform FTP put and get operations.
+do TCP stuff XXX.
 
 _**Console for west:**_
 
 ~~~ shell
-kubectl run ftp-put --attach --rm --image=docker.io/curlimages/curl --restart=Never -- -T /etc/os-release ftp://example:example@ftp-server:2121
-kubectl run ftp-get --attach --rm --image=docker.io/curlimages/curl --restart=Never -- ftp://example:example@ftp-server:2121/os-release
+echo "hello" | kubectl run tcp-client --stdin --rm --image=quay.io/skupper/tcp-example-client --restart=Never -- tcp-server 9090
 ~~~
 
 _Sample output:_
 
 ~~~ console
-$ kubectl run ftp-put --attach --rm --image=docker.io/curlimages/curl --restart=Never -- -T /etc/os-release ftp://example:example@ftp-server:2121
-pod "ftp-put" deleted
-
-$ kubectl run ftp-get --attach --rm --image=docker.io/curlimages/curl --restart=Never -- ftp://example:example@ftp-server:2121/os-release
-NAME="Alpine Linux"
-ID=alpine
-VERSION_ID=3.15.4
-PRETTY_NAME="Alpine Linux v3.15"
-HOME_URL="https://alpinelinux.org/"
-BUG_REPORT_URL="https://bugs.alpinelinux.org/"
-pod "ftp-get" deleted
+$ echo "hello" | kubectl run tcp-client --stdin --rm --image=quay.io/skupper/tcp-example-client --restart=Never -- tcp-server 9090
+XXX
 ~~~
 
 ## Accessing the web console
@@ -379,7 +368,7 @@ _**Console for east:**_
 
 ~~~ shell
 skupper delete
-kubectl delete deployment/ftp-server
+kubectl delete deployment/tcp-server
 ~~~
 
 ## Next steps
