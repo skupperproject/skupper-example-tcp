@@ -1,0 +1,16 @@
+image_tag = "quay.io/skupper/tcp-example-client"
+
+@command
+def build(app):
+    run(f"podman build -t {image_tag} .")
+
+@command
+def run_(app):
+    build(app)
+    run(f"podman run --net host {image_tag} localhost 9191")
+
+@command
+def push(app):
+    run("podman login quay.io")
+    build(app)
+    run(f"podman push {image_tag}")
