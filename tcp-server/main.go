@@ -39,7 +39,7 @@ func conn_handler(conn_number int, host string, conn net.Conn) {
 
 		if err != nil {
 			if err != io.EOF {
-                                fmt.Println("server: connection read error:", err.Error())
+                                fmt.Println("Connection read error:", err.Error())
 			}
 			break
 		}
@@ -60,7 +60,7 @@ func conn_handler(conn_number int, host string, conn net.Conn) {
 
 	conn.Close()
 
-        fmt.Println("server: closed connection", conn_number)
+        fmt.Println("Closed connection", conn_number)
 }
 
 func main() {

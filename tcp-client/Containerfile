@@ -17,7 +17,7 @@
 # under the License.
 #
 
-FROM docker.io/library/golang:1-alpine
+FROM docker.io/library/golang:1-alpine AS build
 
 RUN mkdir /app
 
@@ -25,5 +25,11 @@ COPY . /app
 
 WORKDIR /app
 RUN go build -o main .
+
+FROM docker.io/library/alpine
+
+RUN mkdir /app
+
+COPY --from=build /app/main /app/main
 
 ENTRYPOINT ["/app/main"]
