@@ -7,7 +7,7 @@ def build(app):
 @command
 def run_(app):
     build(app)
-    run(f"podman run --net host {image_tag} localhost 9191")
+    run(f"podman run --net host {image_tag} localhost 9090")
 
 @command
 def push(app):
