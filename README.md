@@ -31,7 +31,8 @@ across cloud providers, data centers, and edge sites.
 
 ## Overview
 
-XXX
+This example shows you how you can use Skupper to connect a TCP
+client on one Kubernetes cluster to a TCP server on another.
 
 ## Prerequisites
 
@@ -303,8 +304,9 @@ deployment tcp-server exposed as tcp-server
 
 ## Step 9: Run the TCP client
 
-In the west namespace, use `kubectl run` and the `curl` image to
-do TCP stuff XXX.
+In the west namespace, use `kubectl run` to run the TCP client.
+Here we send "hello" and get "HELLO" echoed back from the
+server.
 
 _**Console for west:**_
 
@@ -316,7 +318,8 @@ _Sample output:_
 
 ~~~ console
 $ echo "hello" | kubectl run tcp-client --stdin --rm --image=quay.io/skupper/tcp-example-client --restart=Never -- tcp-server 9090
-XXX
+tcp-server-54c997c697-7ql7r: HELLO
+pod "tcp-client" deleted
 ~~~
 
 ## Accessing the web console
