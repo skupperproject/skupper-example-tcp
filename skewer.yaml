@@ -1,57 +1,58 @@
 title: Accessing a TCP server using Skupper
 subtitle: Securely connect to a TCP server on a remote Kubernetes cluster
-github_actions_url: https://github.com/skupperproject/skupper-example-tcp/actions/workflows/main.yaml
 overview: |
   This example shows you how you can use Skupper to connect a TCP
   client on one Kubernetes cluster to a TCP server on another.
 sites:
-  west:
-    kubeconfig: ~/.kube/config-west
-    namespace: west
-  east:
-    kubeconfig: ~/.kube/config-east
-    namespace: east
+  public:
+    title: Public
+    platform: kubernetes
+    namespace: public
+    env:
+      KUBECONFIG: ~/.kube/config-public
+  private:
+    title: Private
+    platform: kubernetes
+    namespace: private
+    env:
+      KUBECONFIG: ~/.kube/config-private
 steps:
-  - standard: configure_separate_console_sessions
-  - standard: access_your_clusters
-  - standard: set_up_your_namespaces
-  - standard: install_skupper_in_your_namespaces
-  - standard: check_the_status_of_your_namespaces
-  - standard: link_your_namespaces
+  - standard: install_the_skupper_command_line_tool
+  - standard: kubernetes/set_up_your_namespaces
   - title: Deploy the TCP server
     preamble: |
-      In the east namespace, use `kubectl create deployment` to deploy the TCP
+      In Private, use `kubectl create deployment` to deploy the TCP
       server.
     commands:
-      east:
+      private:
         - run: kubectl create deployment tcp-server --image quay.io/skupper/tcp-example-server
           output: deployment.apps/tcp-server created
+  - standard: kubernetes/create_your_sites
+  - standard: kubernetes/link_your_sites
   - title: Expose the TCP server
     preamble: |
-      In the east namespace, use `skupper expose` to expose the TCP
-      server on all linked sites.
+      In Private, use `skupper expose` to expose the TCP server on all
+      linked sites.
     commands:
-      east:
-        - await: deployment/tcp-server
+      private:
+        - await_resource: deployment/tcp-server
         - run: skupper expose deployment/tcp-server --port 9090
           output: deployment tcp-server exposed as tcp-server
   - title: Run the TCP client
     preamble: |
-      In the west namespace, use `kubectl run` to run the TCP client.
-      Here we send "hello" and get "HELLO" echoed back from the
-      server.
+      In Public, use `kubectl run` to run the TCP client.  Here we
+      send "hello" and get "HELLO" echoed back from the server.
     commands:
-      west:
-        - await: service/tcp-server
+      public:
+        - await_resource: service/tcp-server
         - run: echo "hello" | kubectl run tcp-client --stdin --rm --image=quay.io/skupper/tcp-example-client --restart=Never -- tcp-server 9090
           output: |
             tcp-server-54c997c697-7ql7r: HELLO
             pod "tcp-client" deleted
-  - standard: accessing_the_web_console
   - standard: cleaning_up
     commands:
-      west:
+      public:
         - run: skupper delete
-      east:
+      private:
         - run: skupper delete
         - run: kubectl delete deployment/tcp-server
