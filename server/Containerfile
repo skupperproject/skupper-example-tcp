@@ -17,21 +17,19 @@
 # under the License.
 #
 
-FROM docker.io/library/golang:1-alpine AS build
+FROM docker.io/library/golang:alpine AS build
 
-RUN mkdir /app
+COPY . /home/root
 
-COPY . /app
-
-WORKDIR /app
+WORKDIR /home/root
 RUN go build -o main .
 
-FROM docker.io/library/alpine
+FROM alpine AS run
 
-RUN mkdir /app
+RUN adduser -S fritz -G root
+USER fritz
 
-COPY --from=build /app/main /app/main
+COPY --from=build --chown=fritz:root /home/root/main /home/fritz/main
 
 EXPOSE 9090
-
-ENTRYPOINT ["/app/main"]
+ENTRYPOINT ["/home/fritz/main"]
